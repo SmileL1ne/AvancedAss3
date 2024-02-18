@@ -1,8 +1,8 @@
-package contact
+package repository
 
 import (
 	"architecture_go/services/contact/internal/domain/contact"
-	"architecture_go/services/contact/internal/repository"
+	"architecture_go/services/contact/internal/domain/group"
 	"database/sql"
 )
 
@@ -10,7 +10,7 @@ type ContactRepository struct {
 	db *sql.DB
 }
 
-func NewContactRepository(db *sql.DB) repository.IContactRepository {
+func New(db *sql.DB) IContactRepository {
 	return &ContactRepository{
 		db: db,
 	}
@@ -29,5 +29,17 @@ func (r *ContactRepository) Update(contact contact.Contact) error {
 }
 
 func (r *ContactRepository) Delete(id int) error {
+	return nil
+}
+
+func (r *ContactRepository) InsertGroup(group group.Group) (int, error) {
+	return 0, nil
+}
+
+func (r *ContactRepository) GetByIDGroup(id int) (group.Group, error) {
+	return group.Group{}, nil
+}
+
+func (r *ContactRepository) InsertContact(contact contact.Contact, id int) error {
 	return nil
 }
