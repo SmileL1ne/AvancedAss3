@@ -5,15 +5,15 @@ import (
 	"architecture_go/services/contact/internal/domain/group"
 )
 
-type IContact interface {
+type IContactUsecase interface {
 	CreateContact(contact.Contact) (int, error) // returns id of created contact
-	GetContact() (contact.Contact, error)
+	GetContact(int) (contact.Contact, error)
 	UpdateContact(contact.Contact) error
 	DeleteContact(int) error // accepts contact id
 }
 
-type IGroup interface {
+type IGroupUsecase interface {
 	CreateGroup(group.Group) (int, error) // returns id of created group
 	GetGroup() (group.Group, error)
-	InsertContact(contact.Contact) error
+	InsertContact(contact.Contact, int) error // accepts contact and group id
 }
