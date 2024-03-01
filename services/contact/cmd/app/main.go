@@ -3,7 +3,7 @@ package main
 import (
 	"architecture_go/pkg/store/postgres"
 	"architecture_go/services/contact/internal/domain/contact"
-	repoContact "architecture_go/services/contact/internal/repository"
+	pgRepo "architecture_go/services/contact/internal/repository/storage/postgres"
 	ucContact "architecture_go/services/contact/internal/usecase"
 	"fmt"
 	"log"
@@ -26,11 +26,11 @@ func main() {
 		panic("nah" + err.Error())
 	}
 
-	contactRepo := repoContact.New(db)
+	contactRepo := pgRepo.New(db)
 	contactUC := ucContact.New(contactRepo)
 
 	http.HandleFunc("/contact/create", func(w http.ResponseWriter, req *http.Request) {
-		id, err := contactUC.CreateContact(contact.Contact{})
+		id, err := contactUC.Create(contact.Contact{})
 		if err != nil {
 			panic("cannot create contact")
 		}

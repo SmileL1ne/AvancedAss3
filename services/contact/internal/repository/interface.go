@@ -11,7 +11,10 @@ type IContactRepository interface {
 	Update(contact.Contact) error
 	Delete(int) error // accepts contact id
 
-	InsertGroup(group.Group) (int, error)     // returns id of created group
-	GetByIDGroup(int) (group.Group, error)    // accepts group id
-	InsertContact(contact.Contact, int) error // accepts contact and group id
+	InsertGroup(group.Group) (int, error) // returns id of created group
+	DeleteGroup(int) error                // accepts group id
+	UpdateGroup(group.Group) error
+	GetGroupByID(int) (group.Group, error) // accepts group id
+	InsertContactToGroup(int, int) error   // accepts contact id and group id
+	DeleteContactFromGroup(int, int) error // accepts contact id and group id
 }
