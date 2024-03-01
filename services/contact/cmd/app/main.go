@@ -2,7 +2,7 @@ package main
 
 import (
 	"architecture_go/pkg/store/postgres"
-	"architecture_go/services/contact/internal/domain/contact"
+	deliveryHTTP "architecture_go/services/contact/internal/delivery/http"
 	pgRepo "architecture_go/services/contact/internal/repository/storage/postgres"
 	ucContact "architecture_go/services/contact/internal/usecase"
 	"fmt"
@@ -28,14 +28,50 @@ func main() {
 
 	contactRepo := pgRepo.New(db)
 	contactUC := ucContact.New(contactRepo)
+	contactDelivery := deliveryHTTP.NewContactDelivery(contactUC)
 
-	http.HandleFunc("/contact/create", func(w http.ResponseWriter, req *http.Request) {
-		id, err := contactUC.Create(contact.Contact{})
-		if err != nil {
-			panic("cannot create contact")
+	http.HandleFunc("/contacts/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			contactDelivery.CreateContact(w, r)
+		case http.MethodGet:
+			contactDelivery.ViewContact(w, r)
+		case http.MethodPut:
+			contactDelivery.UpdateContact(w, r)
+		case http.MethodDelete:
+			contactDelivery.DeleteContact(w, r)
 		}
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(fmt.Sprintf("new contact with id %d created", id)))
+	})
+
+	http.HandleFunc("/groups/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			contactDelivery.CreateGroup(w, r)
+		case http.MethodGet:
+			contactDelivery.GetGroupByID(w, r)
+		case http.MethodPut:
+			contactDelivery.UpdateGroup(w, r)
+		case http.MethodDelete:
+			contactDelivery.DeleteGroup(w, r)
+		default:
+			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
+		}
+	})
+
+	http.HandleFunc("/groups/add-contact", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			contactDelivery.InsertContactToGroup(w, r)
+		} else {
+			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
+		}
+	})
+
+	http.HandleFunc("/groups/remove-contact", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodDelete {
+			contactDelivery.DeleteContactFromGroup(w, r)
+		} else {
+			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
+		}
 	})
 
 	err = http.ListenAndServe("127.0.0.1:7000", nil)
